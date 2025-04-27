@@ -5,7 +5,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/wizpizz/OnePlusPlusLauncher/total?style=for-the-badge)
 ![GitHub Repo stars](https://img.shields.io/github/stars/wizpizz/OnePlusPlusLauncher?style=for-the-badge)
 
-## Please star the [original repository]([url](https://github.com/wizpizz/OnePlusPlusLauncher)) instead of this one!
+## Please star the original repository instead of this one: https://github.com/wizpizz/OnePlusPlusLauncher
 
 ## Overview
 
