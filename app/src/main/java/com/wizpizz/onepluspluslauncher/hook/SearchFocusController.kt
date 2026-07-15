@@ -20,6 +20,13 @@ class SearchFocusController(classLoader: ClassLoader) {
         classLoader,
     )
     private val onSearchBarClick = searchUiManagerClass.getMethod("onSearchBarClick")
+    private val imeControllable = Class.forName(
+        "com.android.launcher3.allapps.search.LauncherAppsSearchContainerLayout",
+        false,
+        classLoader,
+    ).getDeclaredField("imeControllable").apply {
+        isAccessible = true
+    }
 
     fun postOpenSearch(
         launcher: Any,
@@ -28,11 +35,29 @@ class SearchFocusController(classLoader: ClassLoader) {
         val appsView = getAppsView.invoke(launcher) as? View ?: return false
         return appsView.post {
             try {
-                val searchUiManager = getSearchUiManager.invoke(appsView)
-                onSearchBarClick.invoke(searchUiManager)
+                val searchUiManager = checkNotNull(getSearchUiManager.invoke(appsView)) {
+                    "Launcher search UI manager is unavailable"
+                }
+                openSearchWithSystemImeAnimation(searchUiManager)
             } catch (error: Throwable) {
                 onFailure(error)
             }
+        }
+    }
+
+    /**
+     * OnePlus normally takes manual control of the IME and drives a deliberately slow spring
+     * animation. Its own non-controllable fallback still enters search mode correctly, but lets
+     * Android show the keyboard normally. Select that fallback only for module-triggered opens;
+     * restoring the field immediately leaves ordinary launcher interactions unchanged.
+     */
+    private fun openSearchWithSystemImeAnimation(searchUiManager: Any) {
+        val wasImeControllable = imeControllable.getBoolean(searchUiManager)
+        try {
+            imeControllable.setBoolean(searchUiManager, false)
+            onSearchBarClick.invoke(searchUiManager)
+        } finally {
+            imeControllable.setBoolean(searchUiManager, wasImeControllable)
         }
     }
 

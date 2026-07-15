@@ -11,29 +11,38 @@ class SwipeUpAutofocusFeature(
     override val name = "Swipe-up autofocus"
 
     override fun install(context: HookContext) {
-        val launcher = context.classForName(SearchFocusController.LAUNCHER_CLASS)
         val launcherState = context.classForName("com.android.launcher3.LauncherState")
+        val touchController = context.classForName(
+            "com.android.launcher3.touch.OplusAbstractStateChangeTouchController",
+        )
+        val baseTouchController = context.classForName(
+            "com.android.launcher3.touch.AbstractStateChangeTouchController",
+        )
         // Reading this static field during onPackageReady initializes LauncherState before
         // LauncherApplication has attached its context. Keep the Field only and read its value
-        // after the launcher invokes onStateSetEnd, when LauncherState is already initialized.
+        // after a gesture callback, when LauncherState is already initialized.
         val allAppsState = launcherState.getField("ALL_APPS")
-        val stateSetEnd = context.method(
-            launcher,
-            "onStateSetEnd",
+        val updateFinalState = context.method(
+            touchController,
+            "onDragEndUpdateStateInject",
             launcherState,
         )
+        val launcherField = baseTouchController.getDeclaredField("mLauncher").apply {
+            isAccessible = true
+        }
 
-        context.install(name, stateSetEnd) { chain ->
+        context.install(name, updateFinalState) { chain ->
             val result = chain.proceed()
             if (chain.getArg(0) !== allAppsState.get(null)) return@install result
+            if (!context.enabled(FeaturePreferences.SWIPE_UP_AUTOFOCUS)) return@install result
 
-            val redirectedSearch = SearchFocusController.redirectInProgress.getAndSet(false)
-            if (redirectedSearch || context.enabled(FeaturePreferences.SWIPE_UP_AUTOFOCUS)) {
-                focusController.postOpenSearch(
-                    launcher = chain.thisObject,
-                    onFailure = { error -> context.error(name, "could not open search", error) },
-                )
-            }
+            val launcher = requireNotNull(
+                launcherField.get(requireNotNull(chain.thisObject)),
+            )
+            focusController.postOpenSearch(
+                launcher = launcher,
+                onFailure = { error -> context.error(name, "could not open search", error) },
+            )
             result
         }
     }

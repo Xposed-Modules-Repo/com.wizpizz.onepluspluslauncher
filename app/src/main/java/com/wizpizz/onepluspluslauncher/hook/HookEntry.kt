@@ -39,7 +39,7 @@ class HookEntry : XposedModule() {
         runCatching { SearchFocusController(param.classLoader) }
             .onSuccess { focusController ->
                 features += SwipeUpAutofocusFeature(focusController)
-                features += GlobalSearchRedirectFeature()
+                features += GlobalSearchRedirectFeature(focusController)
             }
             .onFailure { error ->
                 log(Log.ERROR, TAG, "Focus-dependent features could not be initialized", error)
