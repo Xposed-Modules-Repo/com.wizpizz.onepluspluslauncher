@@ -2,6 +2,8 @@
 keystore/
 .kotlin/
 decompiled/
+.idea/
+gradle/gradle-daemon-jvm.properties
 
 # Android-specific: https://github.com/github/gitignore/blob/main/Android.gitignore
 

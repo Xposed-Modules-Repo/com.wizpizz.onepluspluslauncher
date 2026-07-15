@@ -1,17 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.AppDefault" parent="Theme.Material3.DayNight">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorPrimaryAccent</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryAccent</item>
-        <item name="colorOnPrimary">@color/colorPrimaryAccent</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/colorPrimaryAccent</item>
-        <item name="colorSecondaryVariant">@color/colorPrimaryAccent</item>
-        <item name="colorOnSecondary">@color/colorPrimaryAccent</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/white</item>
+    <style name="Theme.OnePlusPlusLauncher" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowLightStatusBar">true</item>
-        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">#FFF8F5</item>
     </style>
 </resources>

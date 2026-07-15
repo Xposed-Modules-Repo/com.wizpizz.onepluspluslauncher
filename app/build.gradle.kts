@@ -1,71 +1,61 @@
+import java.util.Base64
+
 plugins {
-    autowire(libs.plugins.android.application)
-    autowire(libs.plugins.kotlin.android)
-    autowire(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = property.project.app.packageName
-    compileSdk = property.project.android.compileSdk
+    namespace = "com.wizpizz.onepluspluslauncher"
+    compileSdk = 37
 
     defaultConfig {
-        applicationId = property.project.app.packageName
-        minSdk = property.project.android.minSdk
-        targetSdk = property.project.android.targetSdk
-        versionName = property.project.app.versionName
-        versionCode = property.project.app.versionCode
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "com.wizpizz.onepluspluslauncher"
+        minSdk = 33
+        targetSdk = 37
+        versionCode = 4
+        versionName = "1.2.1"
 
-        buildConfigField("String", "SUPPORTED_LAUNCHER_VERSION", "\"15.8.17\"")
+        buildConfigField("String", "SUPPORTED_LAUNCHER_VERSION", "\"16.6.9\"")
     }
 
     signingConfigs {
-        // Read from environment first; if missing, read from a local .env file (ignored by Git)
-        val env = System.getenv()
-        val dotEnvFile = rootProject.file(".env")
-        val dotEnv: Map<String, String> = if (dotEnvFile.exists()) {
-            dotEnvFile.readLines()
-                .map { it.trim() }
-                .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
-                .associate { line ->
-                    val idx = line.indexOf('=')
-                    val key = line.substring(0, idx).trim()
-                    var value = line.substring(idx + 1).trim()
-                    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\''))) {
-                        value = value.substring(1, value.length - 1)
-                    }
-                    key to value
-                }
-        } else emptyMap()
+        val environment = System.getenv()
+        val dotEnv = rootProject.file(".env")
+            .takeIf(File::exists)
+            ?.readLines()
+            ?.map(String::trim)
+            ?.filter { it.isNotEmpty() && !it.startsWith("#") && '=' in it }
+            ?.associate { line ->
+                val separator = line.indexOf('=')
+                val key = line.substring(0, separator).trim()
+                val value = line.substring(separator + 1).trim().removeSurrounding("\"").removeSurrounding("'")
+                key to value
+            }
+            .orEmpty()
 
-        fun readSecret(name: String): String? = env[name] ?: dotEnv[name]
+        fun secret(name: String): String? = environment[name] ?: dotEnv[name]
 
-        val ksPath = readSecret("SIGNING_KEY_STORE_PATH")
-        val ksAlias = readSecret("SIGNING_KEY_ALIAS")
-        val ksStorePassword = readSecret("SIGNING_KEY_STORE_PASSWORD")
-        val ksKeyPassword = readSecret("SIGNING_KEY_PASSWORD")
+        val encodedStore = secret("SIGNING_KEY_STORE_BASE64")
+        val storePath = when {
+            !encodedStore.isNullOrBlank() -> File.createTempFile("onepluspluslauncher", ".keystore").apply {
+                writeBytes(Base64.getDecoder().decode(encodedStore))
+                deleteOnExit()
+            }
+            else -> secret("SIGNING_KEY_STORE_PATH")?.takeIf(String::isNotBlank)?.let(::file)
+        }
+        val alias = secret("SIGNING_KEY_ALIAS")
+        val storePasswordValue = secret("SIGNING_KEY_STORE_PASSWORD")
+        val keyPasswordValue = secret("SIGNING_KEY_PASSWORD")
 
-        create("release"){
-            if (!ksPath.isNullOrEmpty() && !ksAlias.isNullOrEmpty() && !ksStorePassword.isNullOrEmpty() && !ksKeyPassword.isNullOrEmpty()) {
-                storeFile = (ksPath as Any?)?.let { file(it) }
-                storePassword = ksStorePassword
-                keyAlias = ksAlias
-                keyPassword = ksKeyPassword
-            } else {
-                println(
-                    """
-                        
-                          _    _  _____ _____ _   _  _____      _____  ______ ____  _    _  _____      _  __________     __
-                         | |  | |/ ____|_   _| \ | |/ ____|    |  __ \|  ____|  _ \| |  | |/ ____|    | |/ /  ____\ \   / /
-                         | |  | | (___   | | |  \| | |  __     | |  | | |__  | |_) | |  | | |  __     | ' /| |__   \ \_/ / 
-                         | |  | |\___ \  | | | . ` | | |_ |    | |  | |  __| |  _ <| |  | | | |_ |    |  < |  __|   \   /  
-                         | |__| |____) |_| |_| |\  | |__| |    | |__| | |____| |_) | |__| | |__| |    | . \| |____   | |   
-                          \____/|_____/|_____|_| \_|\_____|    |_____/|______|____/ \____/ \_____|    |_|\_\______|  |_|   
-                                                                                                                           
-                                                                                                                           
-
-                    """.trimIndent()
-                )
+        create("release") {
+            if (storePath != null && !alias.isNullOrBlank() &&
+                !storePasswordValue.isNullOrBlank() && !keyPasswordValue.isNullOrBlank()
+            ) {
+                storeFile = storePath
+                keyAlias = alias
+                storePassword = storePasswordValue
+                keyPassword = keyPasswordValue
             }
         }
     }
@@ -76,45 +66,34 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
-            // Use the signing configuration
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")?.takeIf { it.storeFile != null }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = listOf(
-            "-Xno-param-assertions",
-            "-Xno-call-assertions",
-            "-Xno-receiver-assertions"
-        )
-    }
+
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        compose = true
     }
-    lint { checkReleaseBuilds = false }
-    // TODO Please visit https://highcapable.github.io/YukiHookAPI/en/api/special-features/host-inject
-    // TODO 请参考 https://highcapable.github.io/YukiHookAPI/zh-cn/api/special-features/host-inject
-    // androidResources.additionalParameters += listOf("--allow-reserved-package-id", "--package-id", "0x64")
 }
 
 dependencies {
-    compileOnly(de.robv.android.xposed.api)
-    implementation(com.highcapable.yukihookapi.api)
-    ksp(com.highcapable.yukihookapi.ksp.xposed)
-    implementation(com.github.duanhong169.drawabletoolbox)
-    implementation(androidx.core.core.ktx)
-    implementation(androidx.appcompat.appcompat)
-    implementation(com.google.android.material.material)
-    implementation(androidx.constraintlayout.constraintlayout)
-    testImplementation(junit.junit)
-    androidTestImplementation(androidx.test.ext.junit)
-    androidTestImplementation(androidx.test.espresso.espresso.core)
-    implementation(me.xdrop.fuzzywuzzy)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.fuzzywuzzy)
+
+    compileOnly(libs.libxposed.api)
+    implementation(libs.libxposed.service)
+
+    testImplementation(libs.junit)
 }

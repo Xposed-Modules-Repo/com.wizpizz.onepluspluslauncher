@@ -1,16 +1,26 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
         gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
         google()
         mavenCentral()
     }
 }
-plugins {
-    id("com.highcapable.sweetdependency") version "1.0.4"
-    id("com.highcapable.sweetproperty") version "1.0.5"
-}
-sweetProperty {
-    rootProject { all { isEnable = false } }
-}
+
 rootProject.name = "OnePlusPlusLauncher"
 include(":app")

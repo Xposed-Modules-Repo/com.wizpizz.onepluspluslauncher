@@ -1,29 +1,57 @@
 package com.wizpizz.onepluspluslauncher.hook
 
-import com.highcapable.yukihookapi.annotation.xposed.InjectYukiHookWithXposed
-import com.highcapable.yukihookapi.hook.factory.configs
-import com.highcapable.yukihookapi.hook.factory.encase
-import com.highcapable.yukihookapi.hook.xposed.proxy.IYukiHookXposedInit
-import com.wizpizz.onepluspluslauncher.hook.features.*
+import android.util.Log
+import com.wizpizz.onepluspluslauncher.LAUNCHER_PACKAGE
+import com.wizpizz.onepluspluslauncher.hook.features.EnterKeyLaunchFeature
+import com.wizpizz.onepluspluslauncher.hook.features.GlobalSearchRedirectFeature
+import com.wizpizz.onepluspluslauncher.hook.features.RankedFuzzySearchFeature
+import com.wizpizz.onepluspluslauncher.hook.features.SwipeUpAutofocusFeature
+import com.wizpizz.onepluspluslauncher.preferences.FeaturePreferences
+import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
+import java.util.concurrent.atomic.AtomicBoolean
 
-@InjectYukiHookWithXposed
-object HookEntry : IYukiHookXposedInit {
+/** Modern libxposed entry point, loaded only in the OnePlus launcher scope. */
+class HookEntry : XposedModule() {
+    private val initialized = AtomicBoolean(false)
+    private var processName: String? = null
 
-    override fun onHook() = encase {
-        configs {
-            debugLog {
-                tag = "OPPLauncherHook"
+    override fun onModuleLoaded(param: ModuleLoadedParam) {
+        processName = param.processName
+    }
+
+    override fun onPackageReady(param: PackageReadyParam) {
+        if (param.packageName != LAUNCHER_PACKAGE ||
+            processName != LAUNCHER_PACKAGE ||
+            !initialized.compareAndSet(false, true)
+        ) return
+
+        val context = HookContext(
+            module = this,
+            classLoader = param.classLoader,
+            preferences = getRemotePreferences(FeaturePreferences.GROUP),
+        )
+        val features = mutableListOf<LauncherFeature>(
+            EnterKeyLaunchFeature,
+            RankedFuzzySearchFeature,
+        )
+        runCatching { SearchFocusController(param.classLoader) }
+            .onSuccess { focusController ->
+                features += SwipeUpAutofocusFeature(focusController)
+                features += GlobalSearchRedirectFeature()
             }
-        }
+            .onFailure { error ->
+                log(Log.ERROR, TAG, "Focus-dependent features could not be initialized", error)
+            }
 
-        loadApp(name = "com.android.launcher") {
-            // Load all feature hooks
-            SwipeUpAutoFocusHook.apply(this)
-            EnterKeyLaunchHook.apply(this)
-            FuzzySearchHook.apply(this)
-            GlobalSearchRedirectHook.apply(this)
-            SwipeDownSearchRedirectHook.apply(this)
-            LeftSwipeDiscoverRedirectHook.apply(this)
+        features.forEach { feature ->
+            runCatching { feature.install(context) }
+                .onFailure { error -> context.error(feature.name, "initialization failed", error) }
         }
+    }
+
+    private companion object {
+        const val TAG = "OnePlusPlusLauncher"
     }
 }

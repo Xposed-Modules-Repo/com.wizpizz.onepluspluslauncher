@@ -1,23 +1,27 @@
 <resources>
     <string name="app_name">OnePlusPlusLauncher</string>
-    <string name="xposed_desc">Enhanced OnePlus Launcher with auto focus search, enter key app launching, global search redirect, and fuzzy search features</string>
-    <string name="about_module">This module is made by YukiHookAPI. \nLearn more https://github.com/HighCapable/YuKiHookAPI</string>
-    <string name="module_version">Module Version: %s</string>
-    <string name="module_not_activated">Not Activated</string>
-    <string name="module_is_activated">Activated</string>
+    <string name="app_subtitle">Focused OnePlus Launcher enhancements</string>
+    <string name="xposed_description">Autofocus, Enter-key launch, fuzzy search, and global-search redirection for OnePlus Launcher</string>
+    <string name="launcher_enhancements">Launcher enhancements</string>
 
-    <string name="pref_fuzzy_search_title">Use Fuzzy Search Algorithm</string>
-    <string name="pref_auto_focus_search_swipe_title">Auto Focus on Swipe Up</string>
-    <string name="pref_auto_focus_search_redirect_title">Auto Focus on Search Button Redirect</string>
-    <string name="pref_auto_focus_swipe_down_redirect_title">Auto Focus on Swipe Down Redirect</string>
-    <string name="pref_enter_key_launch_title">Launch App on Enter</string>
-    <string name="pref_global_search_redirect_title">Redirect Global Search Button</string>
-    <string name="pref_swipe_down_search_redirect_title">Redirect Swipe Down Search</string>
-    <string name="pref_left_swipe_discover_redirect_title">Redirect Left Swipe (Google Discover)</string>
-    <string name="pref_auto_focus_left_swipe_redirect_title">Auto Focus on Left Swipe Redirect</string>
-    <string name="feature_settings">Feature settings</string>
-    <string name="category_search_enhancement">Search Enhancement</string>
-    <string name="category_auto_focus">Auto Focus (Show Keyboard)</string>
-    <string name="category_search_redirect">Search Redirect (to app drawer)</string>
-    <string name="supported_launcher_version">Supported Launcher Version: %s</string>
+    <string name="swipe_up_autofocus">Swipe-up search autofocus</string>
+    <string name="swipe_up_autofocus_description">Focus search and show the keyboard when opening the app drawer</string>
+    <string name="enter_key_launch">Enter-key launch</string>
+    <string name="enter_key_launch_description">Launch the highlighted search result from the keyboard</string>
+    <string name="ranked_fuzzy_search">Ranked fuzzy search</string>
+    <string name="ranked_fuzzy_search_description">Add typo-tolerant matches while preserving OnePlus search features</string>
+    <string name="global_search_redirect">Global-search-button redirect</string>
+    <string name="global_search_redirect_description">Open focused app-drawer search instead of the global search app</string>
+
+    <string name="framework_unavailable">Framework unavailable</string>
+    <string name="framework_unavailable_description">Open LSPosed and make sure the framework is running</string>
+    <string name="checking_scope">Checking module scope</string>
+    <string name="checking_scope_description">Reading the current LSPosed configuration</string>
+    <string name="launcher_not_in_scope">System Launcher not in scope</string>
+    <string name="launcher_not_in_scope_description">Select System Launcher in this module\'s LSPosed scope</string>
+    <string name="scope_check_failed">Scope check failed</string>
+    <string name="scope_check_failed_description">Reopen the app or check LSPosed</string>
+    <string name="ready">Ready</string>
+    <string name="ready_description">If a feature does not work, make sure the module is enabled, then restart System Launcher</string>
+    <string name="version_summary">Module %1$s · Launcher %2$s</string>
 </resources>
