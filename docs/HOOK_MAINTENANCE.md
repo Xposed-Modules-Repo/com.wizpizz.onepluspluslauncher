@@ -15,19 +15,24 @@ The production implementation supports this fixture only. Exact class and method
 ### Swipe-up autofocus
 
 ```text
-com.android.launcher3.Launcher.onStateSetStart(
-    com.android.launcher3.LauncherState,
+com.android.launcher3.touch.OplusAbstractStateChangeTouchController
+    .onDragEndUpdateStateInject(
     com.android.launcher3.LauncherState
 ): void
 ```
 
-The second argument is the destination state. Focus only when it equals `LauncherState.ALL_APPS`. The supported focus path is:
+The argument is the gesture's committed destination. Focus only when it equals `LauncherState.ALL_APPS`. The supported focus path is:
 
 ```text
 Launcher.getAppsView()
 ActivityAllAppsContainerView.getSearchUiManager()
-LauncherTaskbarAppsSearchContainerLayout.showKeyboard()
+LauncherTaskbarAppsSearchContainerLayout.onSearchBarClick()
 ```
+
+For module-triggered opens, temporarily set
+`LauncherAppsSearchContainerLayout.imeControllable` to `false` around
+`onSearchBarClick()`. This selects OnePlus's normal system-IME fallback without
+changing manual search-bar taps.
 
 ### Enter-key launch
 
@@ -94,10 +99,28 @@ com.android.launcher3.Launcher.showAllAppsFromIntent(boolean): void
 
 and return `false` after a successful redirect. If reflection or redirection fails, proceed with the original launcher action.
 
+### Swipe-down search redirect
+
+```text
+com.android.launcher.touch.WorkspacePullDownDetectController.showSearchBar(
+    com.android.launcher.Launcher,
+    java.lang.String,
+    boolean,
+    android.os.Bundle,
+    boolean
+): boolean
+```
+
+This method is reached only after swipe-down has resolved to Global Search.
+When enabled, call `Launcher.showAllAppsFromIntent(true)`, then use the
+controller's public `pullCancel()` method to unwind the pull-down blur and
+scale. Return `true` after a successful redirect; otherwise run the original
+method. Do not manually detach blur surfaces or recreate the old cleanup code.
+
 ## Updating for another launcher release
 
 1. Put the APK under the ignored `decompiled/` directory and record its version and SHA-256.
-2. Decompile it with JADX and inspect all four descriptors above before editing production code.
+2. Decompile it with JADX and inspect all five feature targets above before editing production code.
 3. Trace callers and side effects, not just matching method names. Prefer the launcher's public behavior over manually recreating it.
 4. Update only the affected feature and add or adjust pure unit fixtures where applicable.
 5. Build the debug APK and confirm each feature reports exactly one installed hook.

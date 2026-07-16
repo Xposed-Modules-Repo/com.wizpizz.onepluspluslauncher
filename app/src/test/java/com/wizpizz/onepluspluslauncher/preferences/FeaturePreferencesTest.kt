@@ -6,9 +6,9 @@ import org.junit.Test
 
 class FeaturePreferencesTest {
     @Test
-    fun allFourFeaturesDefaultToEnabled() {
+    fun allFiveFeaturesDefaultToEnabled() {
         assertTrue(FeaturePreferences.DEFAULT_ENABLED)
-        assertEquals(4, FeaturePreferences.keys.size)
+        assertEquals(5, FeaturePreferences.keys.size)
     }
 
     @Test
@@ -19,6 +19,7 @@ class FeaturePreferencesTest {
                 "enter_key_launch_enabled",
                 "ranked_fuzzy_search_enabled",
                 "global_search_redirect_enabled",
+                "swipe_down_search_redirect_enabled",
             ),
             FeaturePreferences.keys,
         )

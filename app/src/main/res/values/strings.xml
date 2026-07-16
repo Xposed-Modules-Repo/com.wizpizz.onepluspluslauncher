@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">OnePlusPlusLauncher</string>
     <string name="app_subtitle">Focused OnePlus Launcher enhancements</string>
-    <string name="xposed_description">Autofocus, Enter-key launch, fuzzy search, and global-search redirection for OnePlus Launcher</string>
+    <string name="xposed_description">Autofocus, Enter-key launch, fuzzy search, and search redirection for OnePlus Launcher</string>
     <string name="launcher_enhancements">Launcher enhancements</string>
 
     <string name="swipe_up_autofocus">Swipe-up search autofocus</string>
@@ -12,6 +12,8 @@
     <string name="ranked_fuzzy_search_description">Add typo-tolerant matches while preserving OnePlus search features</string>
     <string name="global_search_redirect">Global-search-button redirect</string>
     <string name="global_search_redirect_description">Open focused app-drawer search instead of the global search app</string>
+    <string name="swipe_down_search_redirect">Swipe-down search redirect</string>
+    <string name="swipe_down_search_redirect_description">Open focused app-drawer search when swiping down for Global Search</string>
 
     <string name="framework_unavailable">Framework unavailable</string>
     <string name="framework_unavailable_description">Open LSPosed and make sure the framework is running</string>

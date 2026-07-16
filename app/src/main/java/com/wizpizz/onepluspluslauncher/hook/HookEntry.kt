@@ -5,6 +5,7 @@ import com.wizpizz.onepluspluslauncher.LAUNCHER_PACKAGE
 import com.wizpizz.onepluspluslauncher.hook.features.EnterKeyLaunchFeature
 import com.wizpizz.onepluspluslauncher.hook.features.GlobalSearchRedirectFeature
 import com.wizpizz.onepluspluslauncher.hook.features.RankedFuzzySearchFeature
+import com.wizpizz.onepluspluslauncher.hook.features.SwipeDownSearchRedirectFeature
 import com.wizpizz.onepluspluslauncher.hook.features.SwipeUpAutofocusFeature
 import com.wizpizz.onepluspluslauncher.preferences.FeaturePreferences
 import io.github.libxposed.api.XposedModule
@@ -40,6 +41,7 @@ class HookEntry : XposedModule() {
             .onSuccess { focusController ->
                 features += SwipeUpAutofocusFeature(focusController)
                 features += GlobalSearchRedirectFeature(focusController)
+                features += SwipeDownSearchRedirectFeature
             }
             .onFailure { error ->
                 log(Log.ERROR, TAG, "Focus-dependent features could not be initialized", error)

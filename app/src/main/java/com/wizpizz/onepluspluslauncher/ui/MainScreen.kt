@@ -71,6 +71,11 @@ private val featureSettings = listOf(
         R.string.global_search_redirect,
         R.string.global_search_redirect_description,
     ),
+    FeatureSetting(
+        FeaturePreferences.SWIPE_DOWN_SEARCH_REDIRECT,
+        R.string.swipe_down_search_redirect,
+        R.string.swipe_down_search_redirect_description,
+    ),
 )
 
 @Composable
