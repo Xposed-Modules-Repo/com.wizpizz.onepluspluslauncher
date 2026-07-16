@@ -14,6 +14,7 @@ OnePlusPlusLauncher is a small, open-source libxposed module for improving app-d
 - **Enter-key launch** — launches the highlighted result from the keyboard's Search or Go action.
 - **Ranked fuzzy search** — preserves OnePlus pinyin, alias, DMP, multi-user, and privacy-aware results while adding typo-tolerant title matches.
 - **Global-search-button redirect** — opens focused app-drawer search instead of the external global-search application.
+- **Swipe-down search redirect** — opens focused app-drawer search when the home-screen swipe-down action targets Global Search.
 
 Every feature has an independent toggle in a single Material 3 configuration screen and defaults to enabled.
 
@@ -31,7 +32,7 @@ Compatibility with older launcher releases is not maintained. Launcher updates m
 2. Enable OnePlusPlusLauncher in LSPosed.
 3. Select **System Launcher** (`com.android.launcher`) in its scope.
 4. Restart System Launcher.
-5. Open OnePlusPlusLauncher to configure the four features.
+5. Open OnePlusPlusLauncher to configure the five features.
 
 The **Ready** status confirms that LSPosed is reachable and System Launcher is selected. It cannot directly prove that the manager toggle is enabled or that the launcher process has loaded the hooks.
 
@@ -39,7 +40,7 @@ The **Ready** status confirms that LSPosed is reachable and System Launcher is s
 
 - The configuration app is one Jetpack Compose Material 3 screen.
 - libxposed remote preferences are the only settings store.
-- `HookEntry` installs four exact, fail-closed reflection hooks in the launcher process.
+- `HookEntry` installs exact, fail-closed reflection hooks in the launcher process.
 - The fuzzy ranker is pure Kotlin and unit tested independently from Android and the launcher.
 - Decompiled launcher sources and APKs stay local under the ignored `decompiled/` directory.
 
