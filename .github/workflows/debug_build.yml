@@ -48,12 +48,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Configure Xposed repository credentials
+      - name: Mirror master to Xposed main
         env:
           GH_TOKEN: ${{ secrets.XPOSED_REPO_TOKEN }}
-        run: gh auth setup-git
-      - name: Mirror master to Xposed main
         run: |
+          gh auth setup-git
           git remote add xposed "https://github.com/${XPOSED_REPO}.git"
           git fetch --no-tags xposed main
 
