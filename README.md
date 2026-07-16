@@ -44,7 +44,11 @@ The **Ready** status confirms that LSPosed is reachable and System Launcher is s
 - The fuzzy ranker is pure Kotlin and unit tested independently from Android and the launcher.
 - Decompiled launcher sources and APKs stay local under the ignored `decompiled/` directory.
 
-See [Hook maintenance](https://github.com/wizpizz/OnePlusPlusLauncher/blob/master/docs/HOOK_MAINTENANCE.md) for the current target descriptors and adaptation workflow.
+See [Hook maintenance](docs/HOOK_MAINTENANCE.md) for the current target descriptors and adaptation workflow.
+
+## Source mirrors
+
+Development happens in the [canonical repository](https://github.com/oenderg/OnePlusPlusLauncher). Every verified `master` commit is mirrored to the [Xposed Modules Repository](https://github.com/Xposed-Modules-Repo/com.wizpizz.onepluspluslauncher); releases continue to be published there separately.
 
 ## Building
 
@@ -67,4 +71,4 @@ This project is not affiliated with or endorsed by OnePlus, OPPO, or Google. It 
 
 ## License
 
-Licensed under the terms in the [project license](https://github.com/wizpizz/OnePlusPlusLauncher/blob/master/LICENSE).
+Licensed under the terms in the [project license](LICENSE).
